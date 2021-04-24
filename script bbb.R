@@ -1,13 +1,18 @@
 #####Scritp Graf BBB
-
-  
+library(readxl)
+library(lubridate)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
 bbb<-read_excel("teste.xlsx")
 bbb$final<-as_date(bbb$final)
 class(bbb$final)
 deflateBR::
 library(deflateBR)
-bbb$<-deflateBR::inflation(bbb$premio,bbb$final, "03/2021")
-install.packages("priceR")
+bbb$final<-deflateBR::inflation(bbb$premio,bbb$final, "03/2021")
+bbb$ipca<-deflateBR::ipca(bbb$premio,bbb$final, "03/2021")
+bbb$igpm<-deflateBR::igpm(bbb$premio,bbb$final, "03/2021")
+#install.packages("priceR")
 library(priceR)
 dolar<-priceR::historical_exchange_rates("USD", "BRL",
                                   start_date = "2002-04-02", end_date = "2021-04-24")
@@ -34,9 +39,10 @@ bbb%>%ggplot(aes(x=final))+
 options(scipen=999)
 
 library(tidyr)
-install.packages("jcolors")
+#install.packages("jcolors")
 bbb2<-bbb%>%gather(indice, valor, premio:dol_cpi, -one_USD_equivalent_to_x_BRL,-final,-edicao)
 library(jcolors)
+bbb2$valor<-bbb2$valor/1000000
 bbb2%>%ggplot(aes(x=final, y=valor, fill =indice))+
   geom_line(aes(color = indice#, linetype = indice
                 ), size =1.2)+
@@ -44,6 +50,7 @@ bbb2%>%ggplot(aes(x=final, y=valor, fill =indice))+
   theme_minimal()+
   scale_color_manual(values = c("#D36135", "#7FB069", "#ECE4B7", "#E6AA68", "#02020B"))+
   scale_x_date(breaks = "1 year",date_labels = "%Y")+
+  scale_y_continuous(breaks = seq(from = 0, to = 3.7, by = .3))+
   theme(legend.position = "top",
         plot.title = element_text(hjust = 0.5, size=rel(1.2), face = "bold"),
         plot.subtitle = element_text(hjust = 0.5, size = 11),
@@ -60,9 +67,13 @@ bbb2%>%ggplot(aes(x=final, y=valor, fill =indice))+
   theme_minimal()+
   scale_color_jcolors(palette = "pal3")+
   scale_x_date(breaks = "1 year",date_labels = "%Y")+
+  scale_y_continuous(breaks = seq(from = 0, to = 3.7, by = .3))+
   theme(legend.position = "top",
         plot.title = element_text(hjust = 0.5, size=rel(1.2), face = "bold"),
         plot.subtitle = element_text(hjust = 0.5, size = 11),
         plot.caption = element_text(hjust = 0.5, size = 10))+
   labs(title = "Valor Comparado da Premiação do BBB ao longo dos anos",
+       #subtitle = "Fonte: priceR, deflateBR, Wikipedia",
        caption = "Baruque Rodrigues e José Arteta")
+
+  
