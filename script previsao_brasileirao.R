@@ -90,11 +90,11 @@ dataset_alvo %>%
   scale_x_discrete(limits=seq(1,38,1))+
   labs(x = "Rodada",
        y = "Previsão do Modelo",
-       title = "",
+       title = "Visualização da Acurácia das Previsões do Modelo p/ Brasileirão 2022",
        caption = "@baruqrodrigues",
        color = "Acurácia da Previsão")+
   theme_minimal()+
-  theme(legend.position = "top",
+  theme(legend.position = "bottom",
         plot.title = element_text(hjust =.5),
         plot.caption = element_text(hjust = .1),
         panel.grid = element_blank(),
