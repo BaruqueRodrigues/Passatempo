@@ -1,0 +1,163 @@
+---
+title: "Por que Tamanho Amostral Importa"
+format:  
+  html:
+    embed-resources: true
+editor: visual
+author: Baruque Rodrigues (@baruqrodrigues)
+---
+
+## 
+
+### **1. Introdução ao Poder Estatístico**
+
+Afinal o que é Poder Estatístico? é a probabilidade de que o teste corretamente rejeite a hipótese nula quando ela é falsa, ou seja é a capacidade do teste de detectar um efeito real, se houver um. E pro que o poder estatístico serve? Para medirmos a eficácia com que um estudo pode fornecer respostas claras e confiáveis, evitando conclusões errôneas sobre os dados analisados.
+
+#### Definindo Poder Estatístico
+
+Antes de definirmos o formalmente o que ele é precisamos entender 2 conceitos chave, Erro do tipo I e Erro do tipo II.
+
+-   **Erro Tipo I (α)**: É o chamado falso positivo, quando detectamos um efeito quando ele não existe. O Erro do Tipo I é cometido quando a nossa hipótese nula é incorretamente rejeitada, apesar de ser verdadeira.
+
+    O nível de significância do teste é denotado por α, sendo a probabilidade de cometer um erro do Tipo I. Tipicamente, os valores de α são escolhidos como (p-valor de) 0.05 ou 0.01, indicando um limite de tolerância de 5% ou 1% para rejeitar incorretamente a hipótese nula.
+
+-   **Erro Tipo II (β)**: É conhecido como falso negativo, quando não encontramos o efeito apesar dele existir. Este erro acontece quando a hipótese nula deveria ser rejeitada, ou seja o efeito existe, mas não é detectado. O valor de β é afetado por vários fatores, incluindo o tamanho do efeito e o tamanho da amostra. Reduzir β (Erro do Tipo II) aumenta o poder do teste.
+
+Uma forma de exemplificarmos quando podemos cometer o Erro do Tipo I e o Erro do Tipo II é imaginando o teste de covid. Digamos que você trabalha em uma repartição pública, onde o ar condicionado é constante, há acúmulo de mofo, as janelas nunca são abertas, e trabalha a menos de 1 metro dos seus colegas de trabalho. Na nossa situação hipotética, 3 membros do seu time estão em casa, pois estão com COVID. Você precisa fazer o teste, já que pode tanto contaminar outras pessoas, como também estar doente, vai para uma farmácia, compra o teste e está aguardando o resultado.
+
+-   Se você não tiver COVID, o **Erro do Tipo I** pode acontecer, já que pode indicar falsamente que você está infectado.
+
+-   Se você tiver COVID, o **Erro do Tipo II** pode acontecer, onde o teste indica de maneira incorreta que você não está infectado.
+
+Agora que já entendemos o que é o Erro do Tipo I **(α)** e o Erro do Tipo II **(β),** podemos definir formalmente o que é Poder Estatístico.
+
+$$
+Poder Estatístico = 1 - \beta
+$$
+
+O poder estatístico é definido como 1 menos a probabilidade de cometer um erro do Tipo II (β).
+
+### **2. Componentes do Poder Estatístico**
+
+Para verificarmos a capacidade de um teste detectar um efeito quando ele existe, ou seja medir o poder estatístico, precisamos ter em mente alguns componentes, como o **tamanho da amostra** **(n)**, o **tamanho do efeito**, o **nível de significância (α)** e a **variabilidade dos dados**, mas antes vamos definir o que são cada um desses elementos.
+
+-   Tamanho da Amostra (n): são o número de casos utilizados no teste estatístico;
+
+-   Tamanho do Efeito: a magnitude da diferença, ou a magnitude da relação investigada. Em outras palavras o grau de impacto de uma variável sobre a outra;
+
+-   Nivel de Significância **(α)**: a probabilidade de cometer o Erro Tipo I, comumente o valor crítico do p-valor;
+
+-   Variabilidade dos Dados: é a dispersão dos dados em torno de uma medida, geralmente é utilizada como desvio padrão;
+
+#### 2.1 O Tamanho Amostral (n)
+
+O tamanho amostral é um dos fatores mais importantes no Poder Estatístico, já que por definição proporciona uma estimativa mais precisa da média populacional e reduz o erro padrão das estimativas.
+
+Quando estamos desenhando um estudo devemos fazer uma análise para identificarmos se a nossa amostra tem um tamanho adequado para atingir o poder estatístico necessário para identificarmos aquele efeito.
+
+Por exemplo, se quisermos identificar qual o Efeito dos Gastos de Campanha sobre a Obtenção Votos, primeiro temos que identificar qual o número mínimo de casos que a nossa amostra deve ter para que possamos identificar o efeito dos Gastos de Campanha sobre a Obtenção de Votos.
+
+#### 2.2 Tamanho do Efeito
+
+Já o tamanho do Efeito afeta o poder estatístico já que efeitos maiores são mais fáceis de serem identificados que efeitos menores, mesmo que seja usada um mesmo n amostral.
+
+No exemplo abaixo vamos construir 2 modelos com o mesmo tamanho amostral, e a mesma variabilidade dos dados (Média 50, Desvio Padrão = 100), mas vamos indicar um tamanho de efeito 10x maior no primeiro modelo,
+
+```{r}
+
+set.seed(43)
+
+#Tamanho Amostral
+n <- 30
+
+#Variável Independente
+x <- rnorm(n)
+
+#Variável dependente modelo 1
+y1 <- 10 * x + rnorm(n, mean = 50, sd = 100)
+
+#Variável dependente modelo 1
+y2 <- 1 * x + rnorm(n,
+                    mean = 50, sd = 100)
+
+modelo1 <- lm(y1 ~ x)
+modelo2 <- lm(y2 ~ x)
+
+sjPlot::tab_model(modelo1, modelo2)
+```
+
+No modelo a cima podemos enxergar como um efeito com magnitude 10 é detectado com um tamanho amostral de 30, enquanto um efeito de magnitude 1 não é detectado. Considerando que o efeito do modelo 2 é real, ele não seria detectado pelo poder estatístico do teste. Nesse caso cometeríamos o Erro do Tipo II onde o efeito existe mas não é detectado.
+
+#### 2.3 Nível de Significância
+
+O nível de significância é um limiar usado para determinar quando rejeitar a hipótese nula em um teste estatístico, em outras palavras é a probabilidade de cometermos o Erro do Tipo I.
+
+Sendo um dos componentes do poder estatístico que menos temos controle, já que é convencionado pela área. Em estudos de Ciência Política, Ciências Sociais, Sociologia e Economia é convencionado o uso de significância de 5%, ou seja um p valor de 0.05, que define o corte para decidir se um valor é ou não estatisticamente significante.
+
+Variar o nível de significância para baixo reduz a chance do Erro do Tipo I, todavia reduz o poder estatístico do teste, aumentando portanto o Erro do Tipo II, salvo se o tamanho amostral ou o tamanho do efeito sejam ajustados.
+
+#### 2.4 Variabilidade dos Dados
+
+Já a variabilidade faz referência a dispersão dos valores em torno de uma medida, geralmente é o valor do desvio padrão em torno da média. O tamanho da variabilidade pode afetar a detecção de um efeito verdadeiro, já que em tamanhos amostrais menores valores influentes podem mover muito um valor médio.
+
+É sempre bom ter em mente que maior variabilidade implica em maior incerteza na sua estimativa, que acaba reduzindo seu Poder Estatístico. No exemplo abaixo aumentamos o Desvio Padrão, veja como apesar da média e o tamanho amostral continuarem constantes o nosso efeito deixa de ser detectado.
+
+```{r}
+
+set.seed(43)
+
+#Tamanho Amostral
+n <- 30
+
+#Variável Independente
+x <- rnorm(n)
+
+#Variável dependente modelo 1
+y1 <- 10 * x + rnorm(n, mean = 50, sd = 500)
+
+#Variável dependente modelo 1
+y2 <- 1 * x + rnorm(n,
+                    mean = 50, sd = 500)
+
+
+modelo1 <- lm(y1 ~ x)
+modelo2 <- lm(y2 ~ x)
+
+sjPlot::tab_model(modelo1, modelo2)
+```
+
+### **3. Cálculo do Poder Estatístico**
+
+Digamos que precisamos avaliar o impacto do programa Bolsa Família nas taxas de aprovação em alunos do ensino fundamental.
+
+Um estudo bem desenhado tem o cálculo do Poder Estatístico como etapa inicial, já que ele nos permitirá trabalhar com uma amostra que nos permita produzir resultados estatísticos robustos.
+
+Os parametros para o cálculo são:
+
+1.  Tamanho do Efeito: É geralmente estimado com base em estudos anteriores, para o nosso caso hipotético vamos sugerir que a participação no Bolsa Família aumenta as taxas de aprovação escolar em 10% comparado com alunos que não participam do programa.
+
+2.  Variabilidade dos Dados: No nosso caso seria o Desvio Padrão na Taxa de Aprovação Escolar, vamos sugerir um desvio padrão de .20
+
+3.  Nível de Significância (α): Geralmente nas ciências sociais utilizamos o p valor de 0.05, indicando 5% de probabilidade de rejeitar erroneamente a hipótese nula se ela for verdadeira.
+
+4.  **Poder Desejado (1 - β)**: Vamos sugerir um poder de 80% ou 0.80, significando que há 80% de chance de detectar um efeito verdadeiro se ele realmente existir.
+
+No nosso exemplo vamos comparar dois grupos: alunos que recebem o Bolsa Família versus alunos que não recebem. Vamos assumir que a aprovação no grupo de tratamento seja de .75 e a do grupo de controle seja .65, para calcularmos o tamanho da amostra
+
+```{r}
+# proporção de aprovação para o grupo Bolsa Família
+grupo_tratamento <- 0.75 
+# proporção de aprovação para o grupo controle
+grupo_controle <- 0.65  
+# calculo do tamanho do efeito 
+tamanho_efeito <- pwr::ES.h(grupo_tratamento, grupo_controle)  
+
+# Calcula o tamanho da amostra necessário
+pwr::pwr.p.test(h = tamanho_efeito, sig.level = 0.05, power = 0.80, alternative = "two.sided")
+
+
+
+
+```
+
+Nesse caso o Tamanho Amostral para Detectarmos o Efeito Caso ele exista é de 163
