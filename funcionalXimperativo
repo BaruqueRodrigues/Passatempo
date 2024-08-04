@@ -1,5 +1,18 @@
 #O que é mais rápido em R paradigma funcional ou imperativo?
 
+# pegando 1000 numeros primos
+
+url <- "https://en.wikipedia.org/wiki/List_of_prime_numbers"
+numeros_primos <- url %>%
+  rvest::read_html() %>%
+  rvest::html_table() %>%
+  pluck(1) %>%
+  janitor::clean_names() %>%
+  pivot_longer(
+    c(2:last_col()),
+    names_to = "n",
+    values_to = "prime"
+  )
 
 
 # Função imperativa
