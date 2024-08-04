@@ -1,0 +1,71 @@
+#' Transforma Imagem em Ascii
+#'
+#' @param path diretorio para a imagem que será transformada em ascii, 
+#' a imagem deve ser em formato .jpg
+#' @param resize_img redimensiona a imagem para um tamanho menor o padrao é 0.5
+#'
+#' @return
+#' @export
+#'
+#' @examples
+imagem_para_ascii <- function(path,
+                              resize_img = .5){
+  #diretório da imagem
+  path_image <-  here::here(path)
+  
+  # Interrompe se a imagem não for em jpg
+  if(!grepl('.jpg', path_image)){
+    stop('A imagem deve ser em formato .jpg')
+  }
+  
+  #carregando a imagem
+  amor <- imager::load.image(path_image)
+  
+  #caracteres em ascii
+  asc <- gtools::chr(38:126)
+  
+  # Função que transforma em texto
+  transforma_em_texto <- function(texto){
+    imager::implot(
+      imager::imfill(50,50, val = 1),
+      text(25, 25, texto, cex = 5)
+    ) %>% imager::grayscale() %>% mean()
+  }
+  
+  
+  # Ordenando os caracteres ascii por brilho
+  brilho_asc <-  dplyr::tibble(asc) %>% 
+    dplyr::mutate(
+      brilho = purrr::map_dbl(
+        asc,
+        ~transforma_em_texto(.x)
+      )
+    ) %>% 
+    dplyr::arrange(brilho)
+  
+  # preparando o dataset para plotagem
+  dataset_imagem <- imager::grayscale(amor) %>%
+    imager::imresize(resize_img)  %>% 
+    as.data.frame() %>%
+    dplyr::tibble() %>% 
+    dplyr::mutate(
+      quantized_values = cut(value, length(brilho_asc$asc)) %>% as.integer(),
+      brilho = brilho_asc$asc[quantized_values]
+    )
+  
+  # constroi o datavis
+  dataset_imagem %>% 
+    ggplot2::ggplot(
+      aes(
+        x,y
+      )
+    )+
+    ggplot2::geom_text(
+      aes(
+        label = brilho
+      ), size = 1
+    )+
+    ggplot2::scale_y_reverse() +
+    ggplot2::theme_void()
+  
+}
