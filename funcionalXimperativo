@@ -1,0 +1,86 @@
+#O que é mais rápido em R paradigma funcional ou imperativo?
+
+
+
+# Função imperativa
+is_prime_imperative <- function(n) {
+  if (n <= 1) {
+    return(FALSE)
+  }
+  if (n <= 3) {
+    return(TRUE)
+  }
+  if (n %% 2 == 0 || n %% 3 == 0) {
+    return(FALSE)
+  }
+  
+  i <- 5
+  while (i * i <= n) {
+    if (n %% i == 0 || n %% (i + 2) == 0) {
+      return(FALSE)
+    }
+    i <- i + 6
+  }
+  
+  return(TRUE)
+}
+
+# Função funcional vetorizada
+is_prime_functional <- function(n) {
+  if (n <= 1) {
+    return(FALSE)
+  }
+  if (n <= 3) {
+    return(TRUE)
+  }
+  if (n %% 2 == 0 || n %% 3 == 0) {
+    return(FALSE)
+  }
+  
+  k_values <- 5:ceiling(sqrt(n))
+  k_values <- k_values[k_values %% 6 == 1 | k_values %% 6 == 5]
+  
+  is_not_divisible <- function(k) {
+    !(n %% k == 0 || n %% (k + 2) == 0)
+  }
+  
+  
+  sapply(k_values, is_not_divisible)
+    
+}
+
+# funcao funcional vetorizada com pipe
+is_prime_functional <- function(n) {
+  if (n <= 1) {
+    return(FALSE)
+  }
+  if (n <= 3) {
+    return(TRUE)
+  }
+  if (n %% 2 == 0 || n %% 3 == 0) {
+    return(FALSE)
+  }
+  
+  k_values <- 5:ceiling(sqrt(100)) %>%
+    .[. %% 6 == 1 | . %% 6 == 5]
+  
+  is_not_divisible <- function(k) {
+    !(n %% k == 0 || n %% (k + 2) == 0)
+  }
+  
+  
+  sapply(k_values, is_not_divisible)
+  
+}
+
+# Teste de desempenho
+
+teste <- microbenchmark::microbenchmark(
+  sapply(numeros_primos$prime,
+         \(.x){is_prime_imperative(.x)}),
+  sapply(numeros_primos$prime,
+         \(.x){is_prime_functional(.x)}),
+  sapply(numeros_primos$prime,
+         \(.x){is_prime_functional_pipe(.x)}),
+  replications = 10000
+)
