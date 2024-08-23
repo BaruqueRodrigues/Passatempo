@@ -49,7 +49,8 @@ posterior_probability <- function(n) {
   p_dados_dado_justo <- (1/6)^n
   p_viciado_dado_dados <- (p_dados_dado_viciado * p_viciado) / 
     ((p_dados_dado_viciado * p_viciado) + (p_dados_dado_justo * p_justo))
-  return(p_viciado_dado_dados)
+  
+  p_viciado_dado_dados
 }
 
 # Criar um data frame com as probabilidades para cada número de jogadas
